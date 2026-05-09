@@ -4,7 +4,11 @@ const nodemailer = require('nodemailer');
 
 function getTransporter() {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,       // STARTTLS — avoids IPv6 SSL endpoint that Render blocks
+    requireTLS: true,
+    family: 4,           // force IPv4 — Render free tier doesn't support IPv6 outbound
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD
@@ -49,7 +53,7 @@ Reply directly to this email to respond.`
     res.json({ success: true });
   } catch (err) {
     console.error('Contact email error:', err.message);
-    res.status(500).json({ error: 'Failed to send email. Please try again.', debug: err.message });
+    res.status(500).json({ error: 'Failed to send email. Please try again.' });
   }
 });
 
