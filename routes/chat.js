@@ -1,28 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const claude = require('../services/claude');
 const supabase = require('../services/supabase');
 const n8n = require('../services/n8n');
 
 async function emailLeadAlert(lead) {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return;
+  if (!process.env.RESEND_API_KEY || !process.env.GMAIL_USER) return;
   try {
-    const t = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      family: 4,
-      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const scoreEmoji = lead.score === 'HOT' ? '🔥' : lead.score === 'WARM' ? '🌡️' : '❄️';
     const scoreColor = lead.score === 'HOT' ? '#e53e3e' : lead.score === 'WARM' ? '#d97706' : '#3182ce';
-    await t.sendMail({
-      from: `"Harshith Agent" <${process.env.GMAIL_USER}>`,
+    await resend.emails.send({
+      from:    'Harshith Agent <onboarding@resend.dev>',
+      to:      [process.env.GMAIL_USER],
       replyTo: lead.email,
-      to: process.env.GMAIL_USER,
       subject: `${scoreEmoji} ${lead.score} LEAD: ${lead.name} — ${lead.project}`,
       html: `
         <h2 style="color:${scoreColor}">${scoreEmoji} ${lead.score} Lead from Portfolio Chat</h2>
