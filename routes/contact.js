@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Contact email error:', err.message);
-    res.status(500).json({ error: 'Failed to send email. Please try again.' });
+    res.status(500).json({ error: 'Failed to send email. Please try again.', debug: err.message });
   }
 });
 
