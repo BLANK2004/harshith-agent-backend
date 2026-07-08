@@ -10,13 +10,17 @@ const contactRoutes = require('./routes/contact');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const allowedOrigins = [
+  'https://harshithbhosale.is-a.dev',
+  'https://harshithbhosale.netlify.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500',
+  'null' // for local file:// testing
+];
+if (process.env.ALLOWED_ORIGIN) allowedOrigins.push(process.env.ALLOWED_ORIGIN);
+
 app.use(cors({
-  origin: [
-    process.env.ALLOWED_ORIGIN || 'https://harshithbhosale.netlify.app',
-    'http://localhost:3000',
-    'http://127.0.0.1:5500',
-    'null' // for local file:// testing
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
